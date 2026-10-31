@@ -1,0 +1,48 @@
+diff --git a/esm/utils/oxcShaker/callableProvenanceIndex.js b/esm/utils/oxcShaker/callableProvenanceIndex.js
+index 571b6d7..dc24307 100644
+--- a/esm/utils/oxcShaker/callableProvenanceIndex.js
++++ b/esm/utils/oxcShaker/callableProvenanceIndex.js
+@@ -321,11 +321,6 @@ export const createCallableProvenanceIndex = ({ bindingOwners, program }) => {
+ 	const resolveAliasBinding = resolveProvenanceAliases;
+ 	const addCallableResultEffects = (roots, provenance) => {
+ 		provenance.bindings.forEach((binding) => roots.add(binding));
+-		if (provenance.mayAliasAnyRootImport) {
+-			// This is the liveness boundary: the virtual cohort becomes concrete
+-			// only while computing effects of code that is actually reached.
+-			rootImportedBindings.forEach((binding) => roots.add(binding));
+-		}
+ 	};
+ 	const collectContextualRoots = (value, aliases, expandCallableResults = true) => {
+ 		const current = unwrapAliasExpression(value);
+@@ -397,9 +392,6 @@ export const createCallableProvenanceIndex = ({ bindingOwners, program }) => {
+ 		if (current.type === "CallExpression") {
+ 			const roots = new Set(collectCallableExpressionRoots(current));
+ 			const calleeBinding = getCalleeBinding(current.callee);
+-			if (calleeBinding && [...resolveAliasBinding(calleeBinding, aliases)].some(aliasesImportedRoot)) {
+-				rootImportedBindings.forEach((root) => roots.add(root));
+-			}
+ 			return roots;
+ 		}
+ 		return new Set();
+diff --git a/esm/utils/oxcShaker/statementGraph.js b/esm/utils/oxcShaker/statementGraph.js
+index f98c4e8..bce0359 100644
+--- a/esm/utils/oxcShaker/statementGraph.js
++++ b/esm/utils/oxcShaker/statementGraph.js
+@@ -416,9 +416,6 @@ const buildShakerProgramFacts = (program, code, isEsModule) => {
+ 			importedEffects.add(statement);
+ 		}
+ 	});
+-	callableProvenance.rootImportedBindings.forEach((binding) => {
+-		importedEffects.forEach((effect) => addEffect(binding, effect));
+-	});
+ 	callableProvenance.aliasComponents.forEach((component, binding) => {
+ 		if (component.values().next().value !== binding) {
+ 			return;
+@@ -474,7 +471,6 @@ export const shakeOxcToESM = (code, filename, options) => {
+ 		mark(owner);
+ 		callableProvenance.visitCallableResultDependents(binding, visitedCallableResultEffects, (path) => callableResultEffects.get(path)?.forEach((effect) => mark(effect)));
+ 	};
+-	potentiallyAbruptStatements.forEach((statement) => mark(statement));
+ 	statements.forEach((statement) => {
+ 		const hasWildcardReexport = statement.exportNames.has("*");
+ 		const selectedExports = [...statement.exportNames].filter((name) => keepAllExports || name === "*" && requested.size > 0 && !requested.has("side-effect") || requested.has(name));

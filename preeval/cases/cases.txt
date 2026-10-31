@@ -1,0 +1,16 @@
+mut out keep p.color = 'blue'
+call out keep p.setColor('blue')
+local out keep p.color = 'blue'
+arg out keep applyTheme(
+import-arg out keep registerTheme(
+import-mut out keep theme.color = 'blue'
+cross out keep registerTheme(
+gssp out drop withSession(
+destructure labelColor drop createSlice(
+preval-gssp __wywPreval drop withSession(
+font labelColor,gap drop Montserrat(
+font labelColor,gap drop last(
+nested-gssp __wywPreval drop withSession(
+nested-gssp __wywPreval drop Page.section =
+theme-call __wywPreval keep setTheme(
+alias-mut out keep alias.width = 400

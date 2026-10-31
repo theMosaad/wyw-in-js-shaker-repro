@@ -1,0 +1,12 @@
+{
+  "name": "wyw-shaker-repro",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.12"
+  },
+  "scripts": {
+    "matrix": "node matrix.mjs"
+  },
+  "packageManager": "pnpm@12.15.0"
+}

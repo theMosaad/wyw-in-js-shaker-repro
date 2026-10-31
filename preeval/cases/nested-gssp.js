@@ -1,0 +1,11 @@
+import { withSession } from './with-session';
+import { withHeader } from './with-header';
+import { withUser } from './with-user';
+import { Section } from './enums';
+import { rem } from 'polished';
+const _exp = () => rem(4);
+export const getServerSideProps = withSession(withHeader, withUser('/login'));
+const Page = () => null;
+Page.section = Section.Home;
+export default Page;
+export const __wywPreval = { _exp: _exp };
